@@ -14,9 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.soundgem.ui.theme.SoundGemTheme
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -44,6 +48,21 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    private fun getData() {
+        lifecycleScope.launch {
+            val client = getClient()
+            TODO("Video too old, how to fetch from table?")
+        }
+    }
+    private fun getClient() {
+        val client = createSupabaseClient(
+            supabaseUrl ="https://hstotxtfkjolmjqbrkka.supabase.co",
+            supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzdG90eHRma2pvbG1qcWJya2thIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTczNzg0ODYsImV4cCI6MjAxMjk1NDQ4Nn0.3EgSSvY9HgNjHEDT_4jAVnd4rwZKKP2bEP5kweJsmTU",
+        ) {
+            install(Postgrest)
+        }
     }
 
     @SuppressLint("StaticFieldLeak")

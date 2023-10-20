@@ -1,4 +1,6 @@
 package com.example.soundgem
+import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.annotations.SupabaseInternal
 import retrofit2.*;
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,5 +16,8 @@ object RetrofitClient {
     val api: SoundboardApi by lazy {
         retrofit.create(SoundboardApi::class.java)
     }
+
+    @OptIn(SupabaseInternal::class)
+    val url = BuildConfig
 
 }
