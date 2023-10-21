@@ -1,23 +1,28 @@
 package com.example.soundgem
 import android.util.Log
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.launch
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 class SupaBaseService {
 
-    fun getData(lifecycleScope: LifecycleCoroutineScope) {
+    fun getData(lifecycleScope: LifecycleCoroutineScope): MutableList<AudioFile> {
         lifecycleScope.launch {
             val client = getClient()
             val response = client.postgrest["audio"].select()
             val data = response.decodeList<Audio>()
-            Log.e("supabase", data.toString())
+            Log.d("supabase", data.toString())
         }
+        val file1 = AudioFile("Na hör mal", "content1")
+        val file2 = AudioFile("over 9000", "content1")
+        val file3 = AudioFile("NOOOO", "content1")
+        val file4 = AudioFile("rickRoll", "content1")
+        val files = mutableListOf<AudioFile>(file1, file2, file3, file4)
+        (1..20).map { files.add(AudioFile("test", "content")) }
+        return files
     }
 
      private fun getClient(): SupabaseClient {

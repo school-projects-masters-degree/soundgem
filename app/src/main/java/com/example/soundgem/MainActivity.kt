@@ -1,7 +1,6 @@
 package com.example.soundgem
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -31,11 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import com.example.soundgem.ui.theme.SoundGemTheme
 
 
 data class AudioFile(var name: String, var content: String)
@@ -45,13 +40,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val supaBaseService = SupaBaseService()
-        supaBaseService.getData(lifecycleScope)
-        val file1 = AudioFile("Na hör mal", "content1")
-        val file2 = AudioFile("over 9000", "content1")
-        val file3 = AudioFile("NOOOO", "content1")
-        val file4 = AudioFile("rickRoll", "content1")
-        val files = mutableListOf<AudioFile>(file1, file2, file3, file4)
-        (1..20).map { files.add(AudioFile("test", "content")) }
+        val files = supaBaseService.getData(lifecycleScope)
         setContent {
             Scaffold(
                 topBar = { Header() },
@@ -63,93 +52,97 @@ class MainActivity : ComponentActivity() {
     }
 
 
-@Composable
-fun AudioGrid(files: MutableList<AudioFile>, padding: PaddingValues) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed( count = 2 ),
-        modifier = Modifier
-            .padding(padding)
-            .fillMaxHeight()
-    ) {
-        files.map { file -> item {
-            Box(
-                modifier = Modifier
-                    .height(160.dp)
-                    .padding(vertical = 10.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    FilledTonalButton(
-                        colors = ButtonDefaults.filledTonalButtonColors(
-                            containerColor = colorResource(R.color.primary_300),
-                            contentColor = Color.Black
-                        ),
-                        elevation= ButtonDefaults.buttonElevation(12.dp),
-                        modifier = Modifier
-                            .height(80.dp)
-                            .width(80.dp),
-                        onClick = { println(file.content) }){
-                        Text(
-                            text="\uD83D\uDE00",
-                            fontSize = 32.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Text(
-                        text = file.name,
-                    )
-    }
-}
-}
-
-
-@Composable
-fun Header() {
-    rememberSystemUiController().setSystemBarsColor(
-        color = colorResource(R.color.primary_500)
-    )
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(colorResource(R.color.primary_500)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = "Soundgem",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.white)
-        )
-    }
-}
-
-@Composable
-fun Footer() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp)
-            .background(colorResource(R.color.primary_500)),
-        contentAlignment = Alignment.Center,
-    ) {
-        FilledTonalButton(
-            onClick = {/*TODO*/},
-            colors = ButtonDefaults.filledTonalButtonColors(
-                containerColor = colorResource(R.color.primary_200),
-                contentColor = Color.Black
-            ),
+    @Composable
+    fun AudioGrid(files: MutableList<AudioFile>, padding: PaddingValues) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(count = 2),
             modifier = Modifier
-                .height(45.dp)
+                .padding(padding)
+                .fillMaxHeight()
+        ) {
+            files.map { file ->
+                item {
+                    Box(
+                        modifier = Modifier
+                            .height(160.dp)
+                            .padding(vertical = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            FilledTonalButton(
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = colorResource(R.color.primary_300),
+                                    contentColor = Color.Black
+                                ),
+                                elevation = ButtonDefaults.buttonElevation(12.dp),
+                                modifier = Modifier
+                                    .height(80.dp)
+                                    .width(80.dp),
+                                onClick = { println(file.content) }) {
+                                Text(
+                                    text = "\uD83D\uDE00",
+                                    fontSize = 32.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                            Text(
+                                text = file.name,
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    @Composable
+    fun Header() {
+        rememberSystemUiController().setSystemBarsColor(
+            color = colorResource(R.color.primary_500)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(colorResource(R.color.primary_500)),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "New",
+                text = "Soundgem",
                 fontSize = 20.sp,
-                color = colorResource(R.color.primary_700)
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.white)
             )
+        }
+    }
+
+    @Composable
+    fun Footer() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .background(colorResource(R.color.primary_500)),
+            contentAlignment = Alignment.Center,
+        ) {
+            FilledTonalButton(
+                onClick = {/*TODO*/ },
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = colorResource(R.color.primary_200),
+                    contentColor = Color.Black
+                ),
+                modifier = Modifier
+                    .height(45.dp)
+            ) {
+                Text(
+                    text = "New",
+                    fontSize = 20.sp,
+                    color = colorResource(R.color.primary_700)
+                )
+            }
         }
     }
 }
