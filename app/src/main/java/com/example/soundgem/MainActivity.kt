@@ -1,6 +1,7 @@
 package com.example.soundgem
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -30,11 +31,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.soundgem.ui.theme.SoundGemTheme
+
+
 data class AudioFile(var name: String, var content: String)
+
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val supaBaseService = SupaBaseService()
+        supaBaseService.getData(lifecycleScope)
         val file1 = AudioFile("Na hör mal", "content1")
         val file2 = AudioFile("over 9000", "content1")
         val file3 = AudioFile("NOOOO", "content1")
@@ -90,12 +101,10 @@ fun AudioGrid(files: MutableList<AudioFile>, padding: PaddingValues) {
                     Text(
                         text = file.name,
                     )
-                }
-            }
-        } }
     }
 }
 }
+
 
 @Composable
 fun Header() {
