@@ -25,7 +25,7 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties.getProperty("SUPABASE_ANON_KEY")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
-
+        buildConfigField("String", "SUPABASE_BUCKET", "\"${properties.getProperty("SUPABASE_BUCKET")}\"")
     }
 
     buildTypes {
@@ -73,8 +73,11 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:1.4.3")
+    implementation("io.github.jan-tennert.supabase:storage-kt:1.4.4")
     implementation("io.ktor:ktor-client-android:2.3.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("androidx.compose.material3:material3:1.1.2")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

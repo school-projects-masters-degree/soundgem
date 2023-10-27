@@ -1,6 +1,7 @@
 package com.example.soundgem
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 data class AudioFile(var name: String, var content: String)
@@ -41,12 +44,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val supaBaseService = SupaBaseService()
         val files = supaBaseService.getData(lifecycleScope)
+        lifecycleScope.launch {
+            Log.d("ExecutionFlow", "Before fetching files")
+            //val bucketItems = supaBaseService.getAllFilesFromBucket()
+            Log.d("ExecutionFlow", "After fetching files")
+            //Log.d("fileUrls", bucketItems.toString())
+        }
         setContent {
             Scaffold(
                 topBar = { Header() },
                 bottomBar = { Footer() }
             ) { innerPadding ->
                 AudioGrid(files = files, padding = innerPadding)
+                ModalBottomSheet(onDismissRequest = { /*TODO*/ }) {
+                    Box(modifier = Modifier.height(250.dp))
+                }
             }
         }
     }
@@ -54,6 +66,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun AudioGrid(files: MutableList<AudioFile>, padding: PaddingValues) {
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(count = 2),
             modifier = Modifier
