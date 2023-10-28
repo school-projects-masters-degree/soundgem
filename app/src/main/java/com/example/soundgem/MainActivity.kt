@@ -22,7 +22,12 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,11 +38,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 data class AudioFile(var name: String, var content: String)
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,13 +57,20 @@ class MainActivity : ComponentActivity() {
             //Log.d("fileUrls", bucketItems.toString())
         }
         setContent {
+            var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+            val bottomSheetState = rememberModalBottomSheetState()
             Scaffold(
                 topBar = { Header() },
-                bottomBar = { Footer() }
+                bottomBar = { Footer(onClickNew = { openBottomSheet = !openBottomSheet }) }
             ) { innerPadding ->
                 AudioGrid(files = files, padding = innerPadding)
-                ModalBottomSheet(onDismissRequest = { /*TODO*/ }) {
-                    Box(modifier = Modifier.height(250.dp))
+                if (openBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { openBottomSheet = false },
+                        sheetState = bottomSheetState,
+                    ) {
+                        Box(modifier = Modifier.height(250.dp))
+                    }
                 }
             }
         }
@@ -124,7 +137,7 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "Soundgem",
+                text = "⟢ Soundgem ⟣",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.white)
@@ -133,7 +146,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Footer() {
+    fun Footer(
+        onClickNew: (() -> Unit)? = null
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -142,7 +157,7 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center,
         ) {
             FilledTonalButton(
-                onClick = {/*TODO*/ },
+                onClick = { onClickNew?.invoke() },
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = colorResource(R.color.primary_200),
                     contentColor = Color.Black
