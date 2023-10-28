@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.lifecycle.lifecycleScope
+import com.example.soundgem.sharedPrefs.SharedPrefView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -69,7 +70,10 @@ class MainActivity : ComponentActivity() {
                         onDismissRequest = { openBottomSheet = false },
                         sheetState = bottomSheetState,
                     ) {
-                        Box(modifier = Modifier.height(250.dp))
+                        Column {
+                            SharedPrefView(viewModel = SharedPrefView(context = applicationContext))
+                            Box(modifier = Modifier.height(250.dp))
+                        }
                     }
                 }
             }
