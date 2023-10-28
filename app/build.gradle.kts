@@ -76,6 +76,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:1.4.4")
     implementation("io.github.jan-tennert.supabase:storage-kt:1.4.4")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("io.ktor:ktor-client-android:2.3.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("androidx.compose.material3:material3:1.1.2")
