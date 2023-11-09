@@ -1,17 +1,20 @@
 package com.example.soundgem.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,8 +29,45 @@ import com.example.soundgem.R
 
 class AudioButton {
     companion object{
+        @OptIn(ExperimentalFoundationApi::class)
         @Composable
-        fun LazyGrid(files: MutableList<AudioFile>, padding: PaddingValues) {
+        fun AudioButton(
+            onClick: () -> Unit,
+            modifier: Modifier = Modifier,
+            onLongClick: (() -> Unit)? = null,
+            onDoubleClick: (() -> Unit)? = null,
+            backgroundColor: Color,
+        ) {
+            Surface(
+                modifier = modifier.combinedClickable(
+                    onClick = onClick,
+                    onDoubleClick = onDoubleClick,
+                    onLongClick = onLongClick,
+                ),
+                shape = MaterialTheme.shapes.extraLarge,
+                color = backgroundColor,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = {
+                        Text(
+                            text = "\uD83D\uDE00",
+                            fontSize = 32.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                )
+            }
+        }
+
+
+        @Composable
+        fun LazyGrid(
+            files: MutableList<AudioFile>,
+            padding: PaddingValues,
+            onSoundLongPress: (file: AudioFile) -> Unit,
+        ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 2),
                 modifier = Modifier
@@ -46,29 +86,20 @@ class AudioButton {
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                FilledTonalButton(
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = colorResource(R.color.primary_300),
-                                        contentColor = Color.Black
-                                    ),
-                                    elevation = ButtonDefaults.buttonElevation(12.dp),
+                                AudioButton(
                                     modifier = Modifier
                                         .height(80.dp)
                                         .width(80.dp),
-                                    onClick = { println(file.content) }) {
-                                    Text(
-                                        text = "\uD83D\uDE00",
-                                        fontSize = 32.sp,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
+                                    onClick = { println("click") },
+                                    onLongClick = { onSoundLongPress(file) },
+                                    backgroundColor = colorResource(R.color.primary_300),
+                                )
                                 Text(
                                     text = file.name,
                                 )
                             }
                         }
                     }
-
                 }
             }
         }
