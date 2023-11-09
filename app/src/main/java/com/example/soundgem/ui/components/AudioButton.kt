@@ -66,6 +66,7 @@ class AudioButton {
         fun LazyGrid(
             files: MutableList<AudioFile>,
             padding: PaddingValues,
+            onSoundLongPress: (file: AudioFile) -> Unit,
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 2),
@@ -90,7 +91,7 @@ class AudioButton {
                                         .height(80.dp)
                                         .width(80.dp),
                                     onClick = { println("click") },
-                                    onLongClick = { println("long") },
+                                    onLongClick = { onSoundLongPress(file) },
                                     backgroundColor = colorResource(R.color.primary_300),
                                 )
                                 Text(
