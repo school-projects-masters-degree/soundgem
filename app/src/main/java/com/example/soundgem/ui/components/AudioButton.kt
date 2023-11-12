@@ -24,11 +24,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.soundgem.AudioFile
 import com.example.soundgem.R
+import com.example.soundgem.supabase.Audio
 
 class AudioButton {
-    companion object{
+    companion object {
         @OptIn(ExperimentalFoundationApi::class)
         @Composable
         fun AudioButton(
@@ -37,6 +37,7 @@ class AudioButton {
             onLongClick: (() -> Unit)? = null,
             onDoubleClick: (() -> Unit)? = null,
             backgroundColor: Color,
+            emojiText: String, // New parameter for emoji
         ) {
             Surface(
                 modifier = modifier.combinedClickable(
@@ -52,7 +53,7 @@ class AudioButton {
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         Text(
-                            text = "\uD83D\uDE00",
+                            text = emojiText, // Use the emoji from the parameter
                             fontSize = 32.sp,
                             textAlign = TextAlign.Center
                         )
@@ -61,12 +62,11 @@ class AudioButton {
             }
         }
 
-
         @Composable
         fun LazyGrid(
-            files: MutableList<AudioFile>,
+            files: List<Audio>,
             padding: PaddingValues,
-            onSoundLongPress: (file: AudioFile) -> Unit,
+            onSoundLongPress: (file: Audio) -> Unit,
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 2),
@@ -86,16 +86,19 @@ class AudioButton {
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                AudioButton(
-                                    modifier = Modifier
-                                        .height(80.dp)
-                                        .width(80.dp),
-                                    onClick = { println("click") },
-                                    onLongClick = { onSoundLongPress(file) },
-                                    backgroundColor = colorResource(R.color.primary_300),
-                                )
+                                file.emoji?.let {
+                                    AudioButton(
+                                        modifier = Modifier
+                                            .height(80.dp)
+                                            .width(80.dp),
+                                        onClick = { println("click") },
+                                        onLongClick = { onSoundLongPress(file) },
+                                        backgroundColor = colorResource(R.color.primary_300),
+                                        emojiText = it // Pass the emoji from the Audio object
+                                    )
+                                }
                                 Text(
-                                    text = file.name,
+                                    text = file.audioTitle ?: "",
                                 )
                             }
                         }
