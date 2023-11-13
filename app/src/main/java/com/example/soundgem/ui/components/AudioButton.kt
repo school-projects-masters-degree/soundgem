@@ -37,7 +37,7 @@ class AudioButton {
             onLongClick: (() -> Unit)? = null,
             onDoubleClick: (() -> Unit)? = null,
             backgroundColor: Color,
-            emojiText: String, // New parameter for emoji
+            emojiText: String,
         ) {
             Surface(
                 modifier = modifier.combinedClickable(
@@ -53,7 +53,7 @@ class AudioButton {
                     verticalAlignment = Alignment.CenterVertically,
                     content = {
                         Text(
-                            text = emojiText, // Use the emoji from the parameter
+                            text = emojiText,
                             fontSize = 32.sp,
                             textAlign = TextAlign.Center
                         )
@@ -86,7 +86,6 @@ class AudioButton {
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                file.emoji?.let {
                                     AudioButton(
                                         modifier = Modifier
                                             .height(80.dp)
@@ -94,9 +93,8 @@ class AudioButton {
                                         onClick = { println("click") },
                                         onLongClick = { onSoundLongPress(file) },
                                         backgroundColor = colorResource(R.color.primary_300),
-                                        emojiText = it // Pass the emoji from the Audio object
+                                        emojiText = file.emoji ?: "",
                                     )
-                                }
                                 Text(
                                     text = file.audioTitle ?: "",
                                 )
