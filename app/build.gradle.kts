@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.10"
     id("com.google.dagger.hilt.android") version "2.41" apply false
+
 }
 
 android {
@@ -30,23 +31,24 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             isDebuggable = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        /*debug {
+            isDebuggable = false
+            isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-        debug {
-            isDebuggable = false
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
+         */
 
 
     }
@@ -88,12 +90,12 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt:1.4.4")
     implementation("io.github.jan-tennert.supabase:storage-kt:1.4.4")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    implementation("io.ktor:ktor-client-android:2.3.5")
+    implementation("io.ktor:ktor-client-android:2.3.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("com.google.dagger:hilt-android:2.44.2")
-    annotationProcessor("com.google.dagger:hilt-compiler:2.44.2")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("com.google.dagger:hilt-android:2.48.1")
+    annotationProcessor("com.google.dagger:hilt-compiler:2.48.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -101,4 +103,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 }
