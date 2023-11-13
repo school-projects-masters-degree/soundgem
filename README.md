@@ -1,7 +1,5 @@
 # Security improvements
 
-Brandl, Cimpo
-
 ## Shrinking apk
 
 ### Before shrinking
