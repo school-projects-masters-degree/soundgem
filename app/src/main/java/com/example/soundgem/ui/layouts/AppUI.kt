@@ -38,11 +38,14 @@ fun AppUI(viewModel: AudioViewModel) {
         AudioButton.LazyGrid(
             files = files,
             padding = innerPadding,
-
-            ) {
-            currentSelectedSound = it
-            openBottomSheet = true
-        }
+            onSoundClick = { audio ->
+                viewModel.downloadAndPlaySound(audio.uri ?: "")
+            },
+            onSoundLongPress = { audio ->
+                currentSelectedSound = audio
+                openBottomSheet = true
+            },
+        )
         if (openBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = { openBottomSheet = false },

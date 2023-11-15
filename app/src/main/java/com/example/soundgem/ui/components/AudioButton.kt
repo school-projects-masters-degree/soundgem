@@ -67,6 +67,7 @@ class AudioButton {
             files: List<Audio>,
             padding: PaddingValues,
             onSoundLongPress: (file: Audio) -> Unit,
+            onSoundClick: (file: Audio) -> Unit,
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(count = 2),
@@ -90,7 +91,7 @@ class AudioButton {
                                         modifier = Modifier
                                             .height(80.dp)
                                             .width(80.dp),
-                                        onClick = { println("click") },
+                                        onClick = { onSoundClick(file) },
                                         onLongClick = { onSoundLongPress(file) },
                                         backgroundColor = colorResource(R.color.primary_300),
                                         emojiText = file.emoji ?: "",
