@@ -12,10 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.soundgem.R
+import java.io.IOException
 
 class Inputs {
     companion object {
@@ -38,11 +35,11 @@ class Inputs {
                 focusedContainerColor = colorResource(R.color.primary_100),
                 unfocusedContainerColor = colorResource(R.color.primary_50),
                 disabledContainerColor = colorResource(R.color.secondary_50),
-                focusedIndicatorColor = colorResource(R.color.primary_500),
+                focusedIndicatorColor = Color.Transparent,
                 focusedPlaceholderColor = colorResource(R.color.primary_500),
                 focusedLabelColor = colorResource(R.color.primary_500),
                 cursorColor = colorResource(R.color.primary_500),
-                unfocusedIndicatorColor = colorResource(R.color.primary_200),
+                unfocusedIndicatorColor = Color.Transparent,
                 unfocusedPlaceholderColor = colorResource(R.color.primary_200),
                 unfocusedLabelColor = colorResource(R.color.primary_300)
             )
@@ -63,24 +60,28 @@ class Inputs {
 
         @Composable
         fun FileInput(
-            onFileSelected: (String) -> Unit,
-            modifier: Modifier = Modifier
+            onFileSelected: (ByteArray) -> Unit,
+            modifier: Modifier = Modifier,
+            isSelected: Boolean?
         ) {
             val context = LocalContext.current
-            val contentResolver = context.contentResolver
-
-            var uri by remember { mutableStateOf<String?>(null) }
             val pickFileLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
             ) { resultUri ->
-                uri = resultUri.toString()
-                onFileSelected(resultUri.toString())
+                try {
+                    val inputStream = context.contentResolver.openInputStream(resultUri!!)
+                    val byteArray = inputStream?.readBytes()
+                    inputStream?.close()
+                    onFileSelected(byteArray!!)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
 
             Box(modifier = modifier
                 .background(colorResource(R.color.primary_500))
                 .clickable {
-                    pickFileLauncher.launch("audio/mp3")
+                    pickFileLauncher.launch("audio/*")
                 }
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -90,7 +91,7 @@ class Inputs {
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    text = "Choose File",
+                    text = if(isSelected == true) {"\uD83D\uDD25  File Selected  \uD83D\uDD25"} else {"Choose File"},
                 )
             }
         }

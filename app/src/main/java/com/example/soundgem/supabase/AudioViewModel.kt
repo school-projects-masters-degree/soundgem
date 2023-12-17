@@ -82,5 +82,21 @@ class AudioViewModel : ViewModel() {
         }
     }
 
+    fun uploadFileByteArray(file: ByteArray, audio: Audio) {
+        viewModelScope.launch {
+            try {
+                val url = repository.uploadSound(file, audio.audioTitle!!)
+                val enrichedAudio = audio.copy();
+                enrichedAudio.uri = url
+                enrichedAudio.type = "mp3"
+                enrichedAudio.amountShared = 0
+                repository.uploadSoundMetaInfo(enrichedAudio)
+                fetchData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
 }

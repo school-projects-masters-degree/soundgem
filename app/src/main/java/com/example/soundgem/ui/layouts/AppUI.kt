@@ -1,11 +1,8 @@
 package com.example.soundgem.ui.layouts
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,7 +60,7 @@ fun AppUI(viewModel: AudioViewModel) {
                 if(bottomSheetMode == BottomSheetMode.SHARE) {
                     BottomSheetContents.ShareContent(selectedSound = currentSelectedSound, soundFile = currentFile, viewModel = viewModel)
                 } else {
-                    BottomSheetContents.UploadNew()
+                    BottomSheetContents.UploadNew(viewModel = viewModel, onUploaded = {openBottomSheet = false})
                 }
 
             }
