@@ -1,11 +1,8 @@
 package com.example.soundgem.ui.layouts
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +14,7 @@ import com.example.soundgem.supabase.Audio
 import com.example.soundgem.supabase.AudioViewModel
 import com.example.soundgem.ui.components.AudioButton
 import com.example.soundgem.ui.components.BottomSheetContents
+import com.example.soundgem.ui.components.BottomSheetMode
 import com.example.soundgem.ui.components.Layout
 
 
@@ -30,10 +28,15 @@ fun AppUI(viewModel: AudioViewModel) {
     var currentSelectedSound by rememberSaveable {
         mutableStateOf<Audio?>(null)
     }
+    var bottomSheetMode by rememberSaveable { mutableStateOf(BottomSheetMode.NEW) }
     val bottomSheetState = rememberModalBottomSheetState()
     Scaffold(
         topBar = { Layout.Header() },
-        bottomBar = { Layout.Footer(onClickNew = { openBottomSheet = !openBottomSheet }) }
+        bottomBar = { Layout.Footer(onClickNew = {
+            openBottomSheet = !openBottomSheet
+            currentSelectedSound = null
+            bottomSheetMode = BottomSheetMode.NEW
+        }) }
     ) { innerPadding ->
 
         AudioButton.LazyGrid(
@@ -45,6 +48,7 @@ fun AppUI(viewModel: AudioViewModel) {
             onSoundLongPress = { audio ->
                 currentSelectedSound = audio
                 openBottomSheet = true
+                bottomSheetMode = BottomSheetMode.SHARE
                 viewModel.downloadSound(audio.uri ?: "", audio.audioTitle)
             },
         )
@@ -53,7 +57,12 @@ fun AppUI(viewModel: AudioViewModel) {
                 onDismissRequest = { openBottomSheet = false },
                 sheetState = bottomSheetState,
             ) {
-                BottomSheetContents.ShareContent(selectedSound = currentSelectedSound, soundFile = currentFile, viewModel = viewModel)
+                if(bottomSheetMode == BottomSheetMode.SHARE) {
+                    BottomSheetContents.ShareContent(selectedSound = currentSelectedSound, soundFile = currentFile, viewModel = viewModel)
+                } else {
+                    BottomSheetContents.UploadNew(viewModel = viewModel, onUploaded = {openBottomSheet = false})
+                }
+
             }
         }
     }

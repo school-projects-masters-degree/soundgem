@@ -34,5 +34,17 @@ class AudioRepository(private val supabaseClient: SupabaseClient) {
         return response
     }
 
+    suspend fun uploadSound(file: ByteArray, name: String): String {
+        println("upload invoked")
+        val bucket = supabaseClient.storage["sounds"]
+        val fullUri = bucket.upload("${name}.mp3", file)
+        return fullUri.substring(fullUri.lastIndexOf("/")+1)
+    }
+
+    suspend fun uploadSoundMetaInfo(audio: Audio){
+        println(audio)
+        supabaseClient.postgrest.from("audio").insert(audio)
+    }
+
 
 }
