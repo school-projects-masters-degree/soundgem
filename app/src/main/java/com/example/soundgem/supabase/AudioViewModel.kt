@@ -17,6 +17,7 @@ class AudioViewModel : ViewModel() {
 
     private val repository = AudioRepository(createClient())
     val filesLiveData = MutableLiveData<List<Audio>>()
+    var currentFile = MutableLiveData<File>()
     private var mediaPlayer: MediaPlayer? = null
 
     fun fetchData() {
@@ -37,11 +38,11 @@ class AudioViewModel : ViewModel() {
         return client
     }
 
-    fun downloadAndPlaySound(uri: String) {
+    fun downloadAndPlaySound(uri: String, name: String?) {
         viewModelScope.launch {
             try {
                 val audioData = repository.downloadSoundFromUri(uri)
-                val tempFile = createTempAudioFile(audioData)
+                val tempFile = createTempAudioFile(audioData, "SoundGem_$name")
                 playAudioFile(tempFile)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -49,15 +50,26 @@ class AudioViewModel : ViewModel() {
         }
     }
 
-    private fun createTempAudioFile(audioData: ByteArray): File {
-        val tempFile = File.createTempFile("temp_audio", ".mp3")
+    fun downloadSound(uri: String, name: String?) {
+            viewModelScope.launch {
+                try {
+                    val audioData = repository.downloadSoundFromUri(uri)
+                    val tempFile = createTempAudioFile(audioData, "SoundGem_$name")
+                    currentFile.postValue(tempFile);
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+    }
+
+    private fun createTempAudioFile(audioData: ByteArray, name: String?): File {
+        val tempFile = File.createTempFile(name ?: "gem", ".mp3", File("/data/data/com.example.soundgem/files/"))
         FileOutputStream(tempFile).use { fos ->
             fos.write(audioData)
-
         }
         return tempFile
     }
-    private fun playAudioFile(file: File) {
+    fun playAudioFile(file: File) {
         mediaPlayer = MediaPlayer().apply {
             setDataSource(file.absolutePath)
             prepare()
@@ -65,6 +77,7 @@ class AudioViewModel : ViewModel() {
             // Release when finished
             setOnCompletionListener {
                 it.release()
+                file.deleteOnExit()
             }
         }
     }
