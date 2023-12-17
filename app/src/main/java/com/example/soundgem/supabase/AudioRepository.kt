@@ -20,6 +20,14 @@ class AudioRepository(private val supabaseClient: SupabaseClient) {
         }
     }
 
+    //TODO: make this work
+    /*suspend fun increaseAmountShared(id: Int) {
+        val supabaseResponse = supabaseClient.postgrest["audio"]
+            .update (mapOf("amountShared" to 17))
+            .eq("id", 1L)
+            .execute()
+    }*/
+
     suspend fun downloadSoundFromUri(uri: String): ByteArray {
         val bucket = supabaseClient.storage["sounds"]
         val response = bucket.downloadPublic(uri)

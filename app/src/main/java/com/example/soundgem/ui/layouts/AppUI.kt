@@ -13,11 +13,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.soundgem.supabase.Audio
 import com.example.soundgem.supabase.AudioViewModel
 import com.example.soundgem.ui.components.AudioButton
+import com.example.soundgem.ui.components.BottomSheetContents
 import com.example.soundgem.ui.components.Layout
 
 
@@ -25,6 +24,8 @@ import com.example.soundgem.ui.components.Layout
 @Composable
 fun AppUI(viewModel: AudioViewModel) {
     val files by viewModel.filesLiveData.observeAsState(initial = emptyList())
+    val currentFile by viewModel.currentFile.observeAsState(initial = null)
+
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var currentSelectedSound by rememberSaveable {
         mutableStateOf<Audio?>(null)
@@ -39,11 +40,12 @@ fun AppUI(viewModel: AudioViewModel) {
             files = files,
             padding = innerPadding,
             onSoundClick = { audio ->
-                viewModel.downloadAndPlaySound(audio.uri ?: "")
+                viewModel.downloadAndPlaySound(audio.uri ?: "", audio.audioTitle)
             },
             onSoundLongPress = { audio ->
                 currentSelectedSound = audio
                 openBottomSheet = true
+                viewModel.downloadSound(audio.uri ?: "", audio.audioTitle)
             },
         )
         if (openBottomSheet) {
@@ -51,9 +53,7 @@ fun AppUI(viewModel: AudioViewModel) {
                 onDismissRequest = { openBottomSheet = false },
                 sheetState = bottomSheetState,
             ) {
-                Box(modifier = Modifier.height(250.dp)) {
-                    Text(text = currentSelectedSound?.audioTitle ?: "none")
-                }
+                BottomSheetContents.ShareContent(selectedSound = currentSelectedSound, soundFile = currentFile, viewModel = viewModel)
             }
         }
     }
