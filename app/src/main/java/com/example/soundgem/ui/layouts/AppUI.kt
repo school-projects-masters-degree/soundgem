@@ -43,7 +43,7 @@ fun AppUI(viewModel: AudioViewModel) {
             files = files,
             padding = innerPadding,
             onSoundClick = { audio ->
-                viewModel.downloadAndPlaySound(audio.uri ?: "", audio.audioTitle)
+                viewModel.onSoundClick(audio)
             },
             onSoundLongPress = { audio ->
                 currentSelectedSound = audio

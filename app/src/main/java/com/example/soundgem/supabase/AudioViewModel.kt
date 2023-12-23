@@ -1,6 +1,8 @@
 package com.example.soundgem.supabase
 
+import android.location.Location
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +21,7 @@ class AudioViewModel : ViewModel() {
     val filesLiveData = MutableLiveData<List<Audio>>()
     var currentFile = MutableLiveData<File>()
     private var mediaPlayer: MediaPlayer? = null
+    var currentLocation = MutableLiveData<Location>()
 
     fun fetchData() {
         viewModelScope.launch {
@@ -55,7 +58,7 @@ class AudioViewModel : ViewModel() {
                 try {
                     val audioData = repository.downloadSoundFromUri(uri)
                     val tempFile = createTempAudioFile(audioData, "SoundGem_$name")
-                    currentFile.postValue(tempFile);
+                    currentFile.postValue(tempFile)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -86,7 +89,7 @@ class AudioViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val url = repository.uploadSound(file, audio.audioTitle!!)
-                val enrichedAudio = audio.copy();
+                val enrichedAudio = audio.copy()
                 enrichedAudio.uri = url
                 enrichedAudio.type = "mp3"
                 enrichedAudio.amountShared = 0
@@ -96,6 +99,38 @@ class AudioViewModel : ViewModel() {
                 e.printStackTrace()
             }
         }
+    }
+
+    // On SoundClick
+
+
+    fun updateLocation(location: Location) {
+        viewModelScope.launch {
+            try {
+                repository.updateLocation(location)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // Upload lat and long to supabase
+    fun onSoundClick(audio: Audio) {
+        viewModelScope.launch {
+            println("onSoundClick invoked")
+            println("Lat: ${currentLocation.value?.latitude}, Long: ${currentLocation.value?.longitude}")
+            currentLocation.value?.let {
+                repository.updateLocation(it)
+            }
+            // Existing code to play the sound
+            downloadAndPlaySound(audio.uri ?: "", audio.audioTitle)
+        }
+    }
+
+    fun updateCurrentLocation(location: Location) {
+        Log.d("AudioViewModel", "Updating location in LiveData")
+
+        currentLocation.postValue(location)
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.soundgem.supabase
 
+import android.location.Location
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
@@ -44,6 +45,22 @@ class AudioRepository(private val supabaseClient: SupabaseClient) {
     suspend fun uploadSoundMetaInfo(audio: Audio){
         println(audio)
         supabaseClient.postgrest.from("audio").insert(audio)
+    }
+
+    suspend fun updateLocation(location: Location) {
+
+        val res =mapOf(
+            "lat" to location.latitude,
+            "long" to location.longitude,
+        )
+        println(res)
+        supabaseClient.postgrest["user_loc"].insert(
+            mapOf(
+                "lat" to location.latitude,
+                "long" to location.longitude,
+            )
+        )
+
     }
 
 
