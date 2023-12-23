@@ -14,6 +14,7 @@ import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import java.security.MessageDigest
 
 class AudioViewModel : ViewModel() {
 
@@ -122,6 +123,8 @@ class AudioViewModel : ViewModel() {
             currentLocation.value?.let {
                 repository.updateLocation(it)
             }
+
+
             // Existing code to play the sound
             downloadAndPlaySound(audio.uri ?: "", audio.audioTitle)
         }
@@ -129,9 +132,60 @@ class AudioViewModel : ViewModel() {
 
     fun updateCurrentLocation(location: Location) {
         Log.d("AudioViewModel", "Updating location in LiveData")
-
         currentLocation.postValue(location)
     }
 
+    fun checksum() {
+        viewModelScope.launch {
+            try {
+                val checksum = repository.getRandomHash()
+                println("Taken Checksum: $checksum")
+
+                val maxLength = 5
+                val charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+                for (length in 1..maxLength) {
+                    val found = bruteForce("", length, charset, checksum)
+                    if (found) {
+                        break
+                    }
+                    println(found)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    fun md5(input: String): String {
+        val bytes = MessageDigest.getInstance("MD5").digest(input.toByteArray())
+        return bytes.joinToString("") {
+            "%02x".format(it)
+        }
+    }
+    fun bruteForce(current: String, maxLength: Int, charset: String, targetHash: String): Boolean {
+        try {
+
+            if (current.length == maxLength) {
+                val hash = md5(current)
+                if (hash == targetHash) {
+                    println("Found: $current")
+                    return true
+                }
+            } else {
+                for (letter in charset) {
+                    if (bruteForce(current + letter, maxLength, charset, targetHash)) {
+                        return true
+                    }
+                }
+            }
+            return false
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+
+    }
 
 }

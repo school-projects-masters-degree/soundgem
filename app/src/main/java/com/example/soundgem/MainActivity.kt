@@ -9,10 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.viewModelScope
 import com.example.soundgem.supabase.AudioViewModel
 import com.example.soundgem.ui.layouts.AppUI
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(), LocationListener {
     private val viewModel: AudioViewModel by viewModels()
@@ -78,6 +80,8 @@ class MainActivity : ComponentActivity(), LocationListener {
             requestPermissionLauncher.launch(
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+        viewModel.checksum()
     }
 
     private fun getLastLocation() {
