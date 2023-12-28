@@ -1,5 +1,6 @@
 package com.example.soundgem
 
+import android.content.Intent
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -9,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import com.example.soundgem.service.ChecksumService
 import com.example.soundgem.supabase.AudioViewModel
 import com.example.soundgem.ui.layouts.AppUI
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -78,6 +80,8 @@ class MainActivity : ComponentActivity(), LocationListener {
             requestPermissionLauncher.launch(
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+        startChecksumService()
     }
 
     private fun getLastLocation() {
@@ -95,5 +99,10 @@ class MainActivity : ComponentActivity(), LocationListener {
     override fun onLocationChanged(location: Location) {
         Log.d("MainActivity", "Location updated: ${location.latitude}, ${location.longitude}")
         viewModel.updateLocation(location)
+    }
+
+    private fun startChecksumService() {
+        val serviceIntent = Intent(this, ChecksumService::class.java)
+        startService(serviceIntent)
     }
 }

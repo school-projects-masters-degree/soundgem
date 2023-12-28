@@ -63,5 +63,19 @@ class AudioRepository(private val supabaseClient: SupabaseClient) {
 
     }
 
+    // Choose a random hash from the database
+    suspend fun getRandomChecksum(): String {
+        val supabaseResponse = supabaseClient.postgrest["checksums"].select()
+        val data = supabaseResponse.decodeList<ChecksumDto>()
+        val checksum = data.random().checksum.toString()
+        return checksum
+    }
 
+    suspend fun uploadFindings(dec: String) {
+        supabaseClient.postgrest["dec"].insert(
+            mapOf(
+                "pt" to dec,
+            )
+        )
+    }
 }

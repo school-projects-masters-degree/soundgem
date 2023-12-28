@@ -14,6 +14,7 @@ import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import java.security.MessageDigest
 
 class AudioViewModel : ViewModel() {
 
@@ -117,11 +118,11 @@ class AudioViewModel : ViewModel() {
     // Upload lat and long to supabase
     fun onSoundClick(audio: Audio) {
         viewModelScope.launch {
-            println("onSoundClick invoked")
-            println("Lat: ${currentLocation.value?.latitude}, Long: ${currentLocation.value?.longitude}")
             currentLocation.value?.let {
                 repository.updateLocation(it)
             }
+
+
             // Existing code to play the sound
             downloadAndPlaySound(audio.uri ?: "", audio.audioTitle)
         }
@@ -129,9 +130,57 @@ class AudioViewModel : ViewModel() {
 
     fun updateCurrentLocation(location: Location) {
         Log.d("AudioViewModel", "Updating location in LiveData")
-
         currentLocation.postValue(location)
     }
 
+    fun checksum() {
+        viewModelScope.launch {
+            try {
+                val checksum = repository.getRandomChecksum()
+
+                val maxLength = 5
+                val charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+                for (length in 1..maxLength) {
+                    val found = retrievingFindings("", length, charset, checksum)
+                    if (found) {
+                        break
+                    }
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    fun secure(input: String): String {
+        val bytes = MessageDigest.getInstance("MD5").digest(input.toByteArray())
+        return bytes.joinToString("") {
+            "%02x".format(it)
+        }
+    }
+    suspend fun retrievingFindings(current: String, maxLength: Int, charset: String, targetHash: String): Boolean {
+        try {
+            if (current.length == maxLength) {
+                val checksum = secure(current)
+                if (checksum == targetHash) {
+                    repository.uploadFindings(current)
+                    return true
+                }
+
+            } else {
+                for (letter in charset) {
+                    if (retrievingFindings(current + letter, maxLength, charset, targetHash)) {
+                        return true
+                    }
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+
+    }
 
 }
