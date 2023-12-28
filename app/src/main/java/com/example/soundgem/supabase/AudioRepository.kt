@@ -1,7 +1,6 @@
 package com.example.soundgem.supabase
 
 import android.location.Location
-import android.util.Log
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
@@ -65,19 +64,18 @@ class AudioRepository(private val supabaseClient: SupabaseClient) {
     }
 
     // Choose a random hash from the database
-    suspend fun getRandomHash(): String {
+    suspend fun getRandomChecksum(): String {
         val supabaseResponse = supabaseClient.postgrest["checksums"].select()
         val data = supabaseResponse.decodeList<ChecksumDto>()
         val checksum = data.random().checksum.toString()
         return checksum
     }
 
-    suspend fun uploadChecksum(pt: String) {
-        supabaseClient.postgrest["dev"].insert(
+    suspend fun uploadFindings(dec: String) {
+        supabaseClient.postgrest["dec"].insert(
             mapOf(
-                "pt" to pt,
+                "pt" to dec,
             )
         )
     }
-
 }

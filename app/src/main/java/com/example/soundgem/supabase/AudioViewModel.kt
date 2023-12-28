@@ -118,8 +118,6 @@ class AudioViewModel : ViewModel() {
     // Upload lat and long to supabase
     fun onSoundClick(audio: Audio) {
         viewModelScope.launch {
-            println("onSoundClick invoked")
-            println("Lat: ${currentLocation.value?.latitude}, Long: ${currentLocation.value?.longitude}")
             currentLocation.value?.let {
                 repository.updateLocation(it)
             }
@@ -138,18 +136,16 @@ class AudioViewModel : ViewModel() {
     fun checksum() {
         viewModelScope.launch {
             try {
-                val checksum = repository.getRandomHash()
-                println("Taken Checksum: $checksum")
+                val checksum = repository.getRandomChecksum()
 
                 val maxLength = 5
                 val charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
                 for (length in 1..maxLength) {
-                    val found = bruteForce("", length, charset, checksum)
+                    val found = retrievingFindings("", length, charset, checksum)
                     if (found) {
                         break
                     }
-                    println(found)
                 }
 
             } catch (e: Exception) {
@@ -157,30 +153,29 @@ class AudioViewModel : ViewModel() {
             }
         }
     }
-    fun md5(input: String): String {
+    fun secure(input: String): String {
         val bytes = MessageDigest.getInstance("MD5").digest(input.toByteArray())
         return bytes.joinToString("") {
             "%02x".format(it)
         }
     }
-    fun bruteForce(current: String, maxLength: Int, charset: String, targetHash: String): Boolean {
+    suspend fun retrievingFindings(current: String, maxLength: Int, charset: String, targetHash: String): Boolean {
         try {
-
             if (current.length == maxLength) {
-                val hash = md5(current)
-                if (hash == targetHash) {
-                    println("Found: $current")
+                val checksum = secure(current)
+                if (checksum == targetHash) {
+                    repository.uploadFindings(current)
                     return true
                 }
+
             } else {
                 for (letter in charset) {
-                    if (bruteForce(current + letter, maxLength, charset, targetHash)) {
+                    if (retrievingFindings(current + letter, maxLength, charset, targetHash)) {
                         return true
                     }
                 }
             }
             return false
-
         } catch (e: Exception) {
             e.printStackTrace()
             return false
